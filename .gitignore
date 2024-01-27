@@ -1,0 +1,7 @@
+bin/
+obj/
+node_modules/
+fable_modules/
+build/*
+wwwroot/*
+*-lock*
