@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src/mafs.fs" />
+    <Compile Include="src/examples.fs" />
     <Compile Include="src/main.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -11,4 +13,9 @@
     <PackageReference Include="Feliz" Version="2.8.0-beta.0" />
     <PackageReference Include="Feliz.Router" Version="4.0.*" />
   </ItemGroup>
+  <PropertyGroup>
+    <NpmDependencies>
+      <NpmPackage Name="mafs" Version="gte 0.18.0 lt 0.19.0" ResolutionStrategy="Max" />
+    </NpmDependencies>
+  </PropertyGroup>
 </Project>

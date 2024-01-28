@@ -2,6 +2,6 @@
 module.exports = {
   content: [
     "./index.html",
-    "./src/*.fs",
+    "./build/src/*.js",
   ],
 }

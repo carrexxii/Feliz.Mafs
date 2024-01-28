@@ -1,7 +1,11 @@
+@import "mafs/core.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer components {
+    #root { @apply w-7/12 mx-auto }
 
+    .page-header { @apply m-8 text-center text-5xl text-slate-100 }
 }
