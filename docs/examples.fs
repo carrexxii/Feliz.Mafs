@@ -88,8 +88,8 @@ let GetStarted () =
                                y = [| -2 ;  2 |] }
                  preserveAspectRatio = !^false }
             [
-                Cartesian { xAxis  = { lines = Math.PI; labels = Labels.Pi }
-                            yAxis  = Axis.Default
+                Cartesian { xAxis  = !^{ lines = Math.PI; labels = Labels.Pi }
+                            yAxis  = !^Axis.Default
                             subDiv = 4 }
                 Plot.OfX <| fun x -> sin x
             ]
@@ -120,8 +120,8 @@ let GetStarted () =
                                y = [| -2 ; 2  |] }
                  preserveAspectRatio = !^false }
             [
-                Cartesian { xAxis  = { lines = Math.PI; labels = Labels.Pi }
-                            yAxis  = Axis.Default
+                Cartesian { xAxis  = !^{ lines = Math.PI; labels = Labels.Pi }
+                            yAxis  = !^Axis.Default
                             subDiv = 4 }
                 Plot.OfX <| fun x -> sin (x - phase.x)
                 phase.element
@@ -225,6 +225,28 @@ let Camera () =
                         <Mafs viewBox={{ x: [-5, 5], y: [-5, 5] }}>
                             <Coordinates.Cartesian />
                             <Polygon points={[[-5, -5], [5, -5], [5, 5], [-5, 5]]} />
+                        </Mafs>
+                    )
+                }
+            """
+    ]
+
+[<ReactComponent>]
+let Coordinates () =
+    Html.div [
+        Heading "Camera Controls"
+        MafsDefault [
+            Polar { PolarProps.Default with
+                      subDiv = 5
+                      lines  = 2 }
+        ]
+        CodeBlock
+            """ import { Mafs, Coordinates } from "mafs"
+
+                function Example() {
+                    return (
+                        <Mafs>
+                            <Coordinates.Polar subdivisions={5} lines={2} />
                         </Mafs>
                     )
                 }

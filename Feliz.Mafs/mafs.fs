@@ -11,6 +11,7 @@ module Types =
     [<StringEnum>] type Contain = Contain
     
     type Vec2 = float array
+    type Matrix = float array
 
     type ViewBox =
         { x      : Vec2
@@ -40,13 +41,6 @@ module Types =
     module Labels =
         [<Import("labelPi", "mafs")>]
         let Pi = jsNative<int -> string>
-
-    type Axis =
-        { lines : float
-          labels: int -> string }
-        static member Default =
-            { lines  = 1.0
-              labels = fun x -> $"{x}" }
 
     [<Emit("UseMovablePoint")>]
     type MovablePoint =
@@ -86,13 +80,29 @@ module Types =
               ssr     = false
               preserveAspectRatio = !^Contain }
 
+    type Axis =
+        { lines : float
+          labels: int -> string }
+        static member Default =
+            { lines  = 2.0
+              labels = fun x -> $"{x}" }
     type CartesianProps =
-        { xAxis : Axis
-          yAxis : Axis
+        { xAxis : U2<bool, Axis>
+          yAxis : U2<bool, Axis>
           subDiv: float }
         static member Default =
-            { xAxis  = Axis.Default
-              yAxis  = Axis.Default
+            { xAxis  = !^Axis.Default
+              yAxis  = !^Axis.Default
+              subDiv = 1 }
+    type PolarProps =
+        { xAxis : U2<bool, Axis>
+          yAxis : U2<bool, Axis>
+          lines : float
+          subDiv: float }
+        static member Default =
+            { xAxis  = !^Axis.Default
+              yAxis  = !^Axis.Default
+              lines  = 1
               subDiv = 1 }
 
     type TextProps =
@@ -112,14 +122,22 @@ module Types =
               color          = "#FFF"
               svgTextProps   = SVGProps }
     
-    type PointProps =
-        { initial  : Vec2
-          constrain: U2<Constrain, Vec2 -> Vec2> }
-        static member Default =
-            { initial   = [| 0; 0 |]
-              constrain = !^(fun v -> v) }
+    [<StringEnum>]
+    type LineStyle =
+        | Solid
+        | Dashed
+    
+    type Color = string
 
-type Binds =
+    type Inequality =
+        { [<Emit(""" ">" : $1 """)>] GT  : (float -> float) option
+          [<Emit(""" "<=": $1 """)>] LTEQ: (float -> float) option
+          [<Emit(""" "<" : $1 """)>] LT  : (float -> float) option
+          [<Emit(""" ">=": $1 """)>] GTEQ: (float -> float) option }
+    
+    type KatexOptions = obj
+
+type Verbatim =
     [<ReactComponent(import="Mafs", from="mafs")>]
     static member Mafs (children: IReactProperty list,
                         ?width  : U2<float, Auto>,
@@ -133,27 +151,107 @@ type Binds =
     [<ReactComponent>]
     static member Mafs (children: ReactElement list,
                         props   : MafsProps) =
-        Binds.Mafs (children = (prop.key 1)::[prop.children children], width = props.width, height = props.height,
-                    pan = props.pan, zoom = props.zoom, viewBox = props.viewBox,
-                    preserveAspectRatio = props.preserveAspectRatio, ssr = props.ssr, onClick = props.onClick)
+        Verbatim.Mafs (children = (prop.key 1)::[prop.children children], width = props.width, height = props.height,
+                       pan = props.pan, zoom = props.zoom, viewBox = props.viewBox,
+                       preserveAspectRatio = props.preserveAspectRatio, ssr = props.ssr, onClick = props.onClick)
 
     [<ReactComponent(import="Coordinates.Cartesian", from="mafs")>]
-    static member Cartesian (?xAxis       : Axis,
-                             ?yAxis       : Axis,
+    static member Cartesian (?xAxis       : U2<bool, Axis>,
+                             ?yAxis       : U2<bool, Axis>,
                              ?subdivisions: float) = React.imported ()
 
+    [<ReactComponent(import="Coordinates.Polar", from="mafs")>]
+    static member Polar (?xAxis       : U2<bool, Axis>,
+                         ?yAxis       : U2<bool, Axis>,
+                         ?lines       : float,
+                         ?subdivisions: float) = React.imported ()
+
+    [<ReactComponent(import="Point", from="mafs")>]
+    static member Point (x              : float,
+                         y              : float,
+                         ?color         : Color,
+                         ?opacity       : float,
+                         ?svgCircleProps: SVGProps) = React.imported ()
+
+    [<ReactComponent(import="Vector", from="mafs")>]
+    static member Vector (tip          : Vec2,
+                          ?tail        : Vec2,
+                          ?color       : Color,
+                          ?opacity     : float,
+                          ?weight      : float,
+                          ?style       : LineStyle,
+                          ?svgLineProps: SVGProps) = React.imported ()
+
+    [<ReactComponent(import="Line.ThroughPoints", from="mafs")>]
+    static member ThroughPoints (point1  : Vec2,
+                                 point2  : Vec2,
+                                 ?color  : Color,
+                                 ?opacity: float,
+                                 ?weight : float,
+                                 ?style  : LineStyle) = React.imported ()
+
+    [<ReactComponent(import="Line.Segment", from="mafs")>]
+    static member LineSegment (point1  : Vec2,
+                               point2  : Vec2,
+                               ?color  : Color,
+                               ?opacity: float,
+                               ?weight : float,
+                               ?style  : LineStyle) = React.imported ()
+
+    [<ReactComponent(import="Line.PointSlope", from="mafs")>]
+    static member PointSlope (point   : Vec2,
+                              slope   : float,
+                              ?color  : Color,
+                              ?opacity: float,
+                              ?weight : float,
+                              ?style  : LineStyle) = React.imported ()
+
+    [<ReactComponent(import="Line.PointAngle", from="mafs")>]
+    static member PointAngle (point   : Vec2,
+                              angle   : float,
+                              ?color  : Color,
+                              ?opacity: float,
+                              ?weight : float,
+                              ?style  : LineStyle) = React.imported ()
+
     [<ReactComponent(import="Circle", from="mafs")>]
-    static member Circle (radius: float,
-                          center: Vec2) = React.imported ()
+    static member Circle (center          : Vec2,
+                          radius          : float,
+                          ?angle          : float,
+                          ?color          : Color,
+                          ?weight         : float,
+                          ?fillOpacity    : float,
+                          ?strokeOpacity  : float,
+                          ?strokeStyle    : LineStyle,
+                          ?svgEllipseProps: SVGProps) = React.imported ()
+
+    [<ReactComponent(import="Ellipse", from="mafs")>]
+    static member Ellipse (center          : Vec2,
+                           radius          : Vec2,
+                           ?color          : Color,
+                           ?weight         : float,
+                           ?fillOpacity    : float,
+                           ?strokeOpacity  : float,
+                           ?strokeStyle    : LineStyle,
+                           ?svgEllipseProps: SVGProps) = React.imported ()
 
     [<ReactComponent(import="Polygon", from="mafs")>]
     static member Polygon (points          : Vec2 array,
-                           ?color          : string,
+                           ?color          : Color,
                            ?weight         : float,
                            ?fillOpacity    : float,
                            ?strokeOpacity  : float,
                            ?strokeStyle    : StrokeStyle,
                            ?svgPolygonProps: SVGProps) = React.imported ()
+
+    [<ReactComponent(import="Polyline", from="mafs")>]
+    static member Polyline (points          : Vec2 array,
+                            ?color          : Color,
+                            ?weight         : float,
+                            ?fillOpacity    : float,
+                            ?strokeOpacity  : float,
+                            ?strokeStyle    : StrokeStyle,
+                            ?svgPolygonProps: SVGProps) = React.imported ()
 
     [<ReactComponent(import="Text", from="mafs")>]
     static member Text (children       : string,
@@ -162,52 +260,136 @@ type Binds =
                         ?attach        : Direction,
                         ?attachDistance: float,
                         ?size          : float,
-                        ?color         : string,
+                        ?color         : Color,
                         ?svgTextProps  : SVGProps) = React.imported ()
 
+    [<ReactComponent(import="LaTeX", from="mafs")>]
+    static member LaTeX (tex         : string,
+                         at          : Vec2,
+                         color       : Color,
+                         katexOptions: KatexOptions) = React.imported ()
+
     [<ReactComponent(import="Plot.OfX", from="mafs")>]
-    static member OfX (props: {| y: float -> float |}) = React.imported ()
+    static member OfX (y                : float -> float,
+                       ?color           : Color,
+                       ?opacity         : float,
+                       ?weight          : float,
+                       ?style           : LineStyle,
+                       ?minSamplingDepth: float,
+                       ?maxSamplingDepth: float) = React.imported ()
+
+    [<ReactComponent(import="Plot.OfY", from="mafs")>]
+    static member OfY (x                : float -> float,
+                       ?color           : Color,
+                       ?opacity         : float,
+                       ?weight          : float,
+                       ?style           : LineStyle,
+                       ?minSamplingDepth: float,
+                       ?maxSamplingDepth: float) = React.imported ()
+
+    [<ReactComponent(import="Plot.Inequality", from="mafs")>]
+    static member Inequality (y                 : Inequality,
+                              x                 : Inequality,
+                              ?color            : Color,
+                              ?weight           : float,
+                              ?strokeColor      : Color,
+                              ?strokeOpacity    : float,
+                              ?fillColor        : Color,
+                              ?fillOpacity      : float,
+                              ?minSamplingDepth : float,
+                              ?maxSamplingDepth : float,
+                              ?upperColor       : Color,
+                              ?upperOpacity     : float,
+                              ?upperWeight      : float,
+                              ?lowerColor       : Color,
+                              ?lowerOpacity     : float,
+                              ?lowerWeight      : float,
+                              ?svgUpperPathProps: SVGProps,
+                              ?svgLowerPathProps: SVGProps,
+                              ?svgFillPathProps : SVGProps) = React.imported ()
+
+    [<ReactComponent(import="Plot.Parametric", from="mafs")>]
+    static member Parametric (xy               : float -> Vec2,
+                              t                : Vec2,
+                              ?color           : Color,
+                              ?opacity         : float,
+                              ?weight          : float,
+                              ?style           : LineStyle,
+                              ?minSamplingDepth: float,
+                              ?maxSamplingDepth: float,
+                              ?svgPathProps    : SVGProps) = React.imported ()
+
+    [<ReactComponent(import="Plot.VectorField", from="mafs")>]
+    static member VectorField (xy         : Vec2 -> Vec2,
+                               xyOpacity  : Vec2 -> float,
+                               step       : float,
+                               opacityStep: float,
+                               color      : Color) = React.imported ()
+
+    [<ReactComponent(import="Transform", from="mafs")>]
+    static member Transform (children  : ReactElement list,
+                             ?matrix   : Matrix,
+                             ?translate: Vec2,
+                             ?scale    : U2<float, Vec2>,
+                             ?rotate   : float,
+                             ?shear    : Vec2) = React.imported ()
+    
+    [<ReactComponent(import="Debug.TransformWidget", from="mafs")>]
+    static member DebugTransformWidget (children: ReactElement list) = React.imported ()
+    
+    [<ReactComponent(import="Debug.ViewportInfo", from="mafs")>]
+    static member DebugViewPortInfo (precision: int) = React.imported ()
+    
+    [<ReactComponent(import="MovablePoint", from="mafs")>]
+    static member DebugViewPortInfo (point    : Vec2,
+                                     onMove   : Vec2 -> unit,
+                                     constrain: U2<Constrain, Vec2 -> Vec2>,
+                                     color    : Color) = React.imported ()
 
     [<Import("useMovablePoint", "mafs")>]
     [<Emit("useMovablePoint($1, {constrain: $2, color: $3})")>]
     static member useMovablePoint (initialPoint: Vec2,
                                    ?constrain  : U2<Constrain, Vec2 -> Vec2>,
-                                   ?color      : string) = jsNative<MovablePoint>
+                                   ?color      : Color) = jsNative<MovablePoint>
 
 [<AutoOpen>]
 module Functions =
-    let vec2 x y: float array = [| x; y |]
-
-    let Mafs props children  = Binds.Mafs (children, props)
-    let MafsDefault children = Binds.Mafs (children, MafsProps.Default)
+    let Mafs props children  = Verbatim.Mafs (children, props)
+    let MafsDefault children = Verbatim.Mafs (children, MafsProps.Default)
 
     [<AutoOpen>]
     module Coordinates =
         [<ReactComponent>]
-        let Cartesian props = 
-            Binds.Cartesian (xAxis = props.xAxis,
-                             yAxis = props.yAxis,
-                             subdivisions = props.subDiv)
+        let Cartesian (props: CartesianProps) = 
+            Verbatim.Cartesian (xAxis = props.xAxis,
+                                yAxis = props.yAxis,
+                                subdivisions = props.subDiv)
+        [<ReactComponent>]
+        let Polar (props: PolarProps) = 
+            Verbatim.Polar (xAxis = props.xAxis,
+                            yAxis = props.yAxis,
+                            lines = props.lines,
+                            subdivisions = props.subDiv)
 
     [<ReactComponent>]
-    let Circle center radius =
-        Binds.Circle (center = center, radius = radius)
+    let Point (vec: Vec2) = Verbatim.Point (vec[0], vec[1])
     [<ReactComponent>]
-    let Polygon points =
-        Binds.Polygon (points = points)
+    let Circle center radius = Verbatim.Circle (center = center, radius = radius)
+    [<ReactComponent>]
+    let Polygon points = Verbatim.Polygon (points = points)
 
     [<ReactComponent>]
     let Text text (pos: Vec2) =
-        Binds.Text (text, pos[0], pos[1])
+        Verbatim.Text (text, pos[0], pos[1])
     [<ReactComponent>]
     let TextAttach text (pos: Vec2) dir =
-        Binds.Text (text, pos[0], pos[1], attach = dir)
+        Verbatim.Text (text, pos[0], pos[1], attach = dir)
 
     let useMovablePoint initial =
-        Binds.useMovablePoint initial
+        Verbatim.useMovablePoint initial
     let useConstrainedPoint initial constrain =
-        Binds.useMovablePoint (initial, constrain = constrain)
+        Verbatim.useMovablePoint (initial, constrain = constrain)
 
     module Plot =
         [<ReactComponent>]
-        let OfX fn = Binds.OfX {| y = fn |}
+        let OfX fn = Verbatim.OfX (y = fn)
