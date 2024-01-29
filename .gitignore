@@ -4,6 +4,6 @@ obj/
 node_modules/
 fable_modules/
 build/*
-wwwroot/*
+public/*
 *-lock*
 api.ts

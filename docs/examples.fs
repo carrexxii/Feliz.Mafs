@@ -1,9 +1,11 @@
-module Examples
+module Mafs.Examples
+
+open System
 
 open Fable.Core.JsInterop
 open Feliz
 
-open SharpMafs
+open Feliz.Mafs
 
 [<ReactComponent>]
 let Heading text =
@@ -21,7 +23,7 @@ let SubHeading text =
 
 [<ReactComponent>]
 let CodeBlock (text: string) =
-    Html.span [
+    Html.code [
         prop.className "text-slate-200 bg-black"
         prop.text text
     ]
@@ -93,7 +95,7 @@ let GetStarted () =
             prop.key 1
             prop.children [
                 Cartesian (subdivisions = 4,
-                           xAxis = { lines  = Mafs.pi
+                           xAxis = { lines  = Math.PI
                                      labels = Pi })
                 Plot.OfX {| y = fun x -> sin x |}
             ]
@@ -127,7 +129,7 @@ let GetStarted () =
             prop.key 1
             prop.children [
                 Cartesian (subdivisions = 4,
-                           xAxis = { lines  = pi
+                           xAxis = { lines  = Math.PI
                                      labels = Pi })
                 Plot.OfX {| y = fun x -> sin (x - phase.x) |}
                 phase.element
@@ -160,3 +162,28 @@ let GetStarted () =
                 }
             """
     ]
+
+[<ReactComponent>]
+let Mafs () =
+    Html.div [
+        Heading "Mafs"
+        Mafs [
+            prop.key 1
+            prop.children [
+                // Text ("I love maths!", 0.0, 0.0)
+                Text [| 0.0; 0.0 |] "I love maths!"
+            ]
+        ]
+        CodeBlock
+            """ import { Mafs, Text } from "mafs"
+
+                function Example() {
+                    return (
+                        <Mafs>
+                            <Text x={0} y={0}>I love math!</Text>
+                        </Mafs>
+                    )
+                }
+            """
+    ]
+

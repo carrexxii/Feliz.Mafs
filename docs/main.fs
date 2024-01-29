@@ -6,12 +6,13 @@ open Feliz.Router
 
 [<ReactComponent>]
 let Router () =
-    let (url, setUrl) = React.useState (Router.currentUrl ())
+    let url, setUrl = React.useState (Router.currentUrl ())
     React.router [
         router.onUrlChanged setUrl
         router.children [
             match url with
-            | [] -> Examples.GetStarted ()
+            | [] -> Mafs.Examples.GetStarted ()
+            | [ "text" ] -> Mafs.Examples.Mafs ()
             | _ -> Html.h1 "Not found"
         ]
     ]

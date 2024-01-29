@@ -1,45 +1,46 @@
-PROJ := ./sharpmafs.fsproj
+SRC_DIR    := ./docs
+LIB_DIR    := ./Feliz.Mafs
+BUILD_DIR  := ./build
+PUBLIC_DIR := ./public
 
-SRC_DIR   := ./src
-BUILD_DIR := ./build
-WWW_ROOT  := ./wwwroot
+PROJ := $(SRC_DIR)/docs.fsproj
 
 all: watch
 
 .PHONY: build
 build: css js
-	@cp ./index.html $(WWW_ROOT)/index.html
+	@cp $(SRC_DIR)/index.html $(PUBLIC_DIR)/index.html
 
 .PHONY: watch
 watch:
-	@trap '$(foreach count, $(shell seq 1 3), kill %$(count);)' SIGINT
-	@npx tailwindcss -i ./styles.css -o $(WWW_ROOT)/styles.css --watch=always &
-	@dotnet fable watch $(PROJ) -o $(BUILD_DIR) --noRestore --silent &
+	@npx tailwindcss -i $(SRC_DIR)/styles.css -o $(PUBLIC_DIR)/styles.css --watch=always &
+	@dotnet fable watch $(PROJ) -o $(BUILD_DIR) --noRestore &
 	@npx webpack serve
 
 .PHONY: js
 js:
-	@dotnet fable $(PROJ) -o $(BUILD_DIR)/.
+	@dotnet fable $(PROJ) -o $(BUILD_DIR)
 
 .PHONY: css
 css:
-	@npx tailwindcss -i ./styles.css -o $(WWW_ROOT)/styles.css
+	@npx tailwindcss -i $(SRC_DIR)/styles.css -o $(PUBLIC_DIR)/styles.css
 
 .PHONY: restore
 restore:
 	@npm install
 	@dotnet tool restore
-	@dotnet restore
+	@dotnet restore $(LIB_DIR)
+	@dotnet restore $(SRC_DIR)
 
 .PHONY: clean
 clean:
-	@dotnet clean
-	@dotnet fable clean --yes
-	@rm -rf $(WWW_ROOT)/*
+	@dotnet clean $(PROJ)
+	@rm -rf $(PUBLIC_DIR)/*
 
 .PHONY: remove
 remove: clean
-	@rm -rf ./obj/ ./bin/
-	@rm -rf ./build/*
+	@rm -rf $(SRC_DIR)/obj/ $(SRC_DIR)/bin/
+	@rm -rf $(LIB_DIR)/obj/ $(LIB_DIR)/bin/
+	@rm -rf $(BUILD_DIR)/*
 	@rm -rf ./node_modules
-	@rm -f ./*-lock.*
+	@rm -f  ./*-lock.*
