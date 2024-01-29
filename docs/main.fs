@@ -11,8 +11,9 @@ let Router () =
         router.onUrlChanged setUrl
         router.children [
             match url with
-            | [] -> Mafs.Examples.GetStarted ()
-            | [ "text" ] -> Mafs.Examples.Mafs ()
+            | []           -> Mafs.Examples.GetStarted ()
+            | [ "text" ]   -> Mafs.Examples.Text ()
+            | [ "camera" ] -> Mafs.Examples.Camera ()
             | _ -> Html.h1 "Not found"
         ]
     ]
