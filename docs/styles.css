@@ -7,8 +7,9 @@
 @tailwind utilities;
 
 @layer components {
+    body  { @apply bg-slate-300 }
     #root { @apply w-7/12 mx-auto }
 
-    .head    { @apply p-8 text-center text-5xl text-slate-100 }
-    .subhead { @apply p-8 text-center text-3xl text-slate-100 }
+    .head    { @apply p-8 text-center text-5xl }
+    .subhead { @apply p-8 text-center text-3xl }
 }

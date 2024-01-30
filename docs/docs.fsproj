@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="components.fs" />
     <Compile Include="examples.fs" />
     <Compile Include="main.fs" />
   </ItemGroup>
