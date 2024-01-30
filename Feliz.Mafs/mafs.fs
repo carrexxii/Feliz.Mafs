@@ -84,7 +84,7 @@ module Types =
         { lines : float
           labels: int -> string }
         static member Default =
-            { lines  = 2.0
+            { lines  = 1.0
               labels = fun x -> $"{x}" }
     type CartesianProps =
         { xAxis : U2<bool, Axis>
@@ -129,13 +129,55 @@ module Types =
     
     type Color = string
 
+    [<StringEnum>]
     type Inequality =
-        { [<Emit(""" ">" : $1 """)>] GT  : (float -> float) option
-          [<Emit(""" "<=": $1 """)>] LTEQ: (float -> float) option
-          [<Emit(""" "<" : $1 """)>] LT  : (float -> float) option
-          [<Emit(""" ">=": $1 """)>] GTEQ: (float -> float) option }
-    
+        | [<CompiledName(">" )>] GT
+        | [<CompiledName(">=")>] GTEQ
+        | [<CompiledName("<" )>] LT
+        | [<CompiledName("<=")>] LTEQ
+
+    type InequalityPair =
+        { lower: Inequality * (float -> float)
+          upper: Inequality * (float -> float) }
+        static member Default =
+            { lower = GT, (fun x -> x)
+              upper = LTEQ, (fun y -> 5) }
+
     type KatexOptions = obj
+
+    type XYAxis =
+        | XAxis
+        | YAxis
+
+    type PlotProps =
+        { fn              : float -> float
+          color           : Color
+          opacity         : float
+          weight          : float
+          style           : LineStyle
+          minSamplingDepth: float
+          maxSamplingDepth: float }
+        static member Default =
+            { fn               = fun x -> x
+              color            = "blue"
+              opacity          = 1.0
+              weight           = 2.0
+              style            = Solid
+              minSamplingDepth = 8
+              maxSamplingDepth = 15 }
+
+type ITheme =
+    abstract foreground: Color
+    abstract background: Color
+    abstract red       : Color
+    abstract orange    : Color
+    abstract green     : Color
+    abstract blue      : Color
+    abstract indigo    : Color
+    abstract violet    : Color
+    abstract pink      : Color
+    abstract yellow    : Color
+let Theme: ITheme = import "Theme" "mafs"
 
 type Verbatim =
     [<ReactComponent(import="Mafs", from="mafs")>]
@@ -287,9 +329,10 @@ type Verbatim =
                        ?minSamplingDepth: float,
                        ?maxSamplingDepth: float) = React.imported ()
 
+    // x / y -> { ">"?: FnX; "<="?: FnX; "<"?: FnX | undefined; ">="?: FnX | undefined; } | undefined
     [<ReactComponent(import="Plot.Inequality", from="mafs")>]
-    static member Inequality (y                 : Inequality,
-                              x                 : Inequality,
+    static member Inequality (?y                : obj,
+                              ?x                : obj,
                               ?color            : Color,
                               ?weight           : float,
                               ?strokeColor      : Color,
@@ -393,3 +436,27 @@ module Functions =
     module Plot =
         [<ReactComponent>]
         let OfX fn = Verbatim.OfX (y = fn)
+
+        let create fn = { PlotProps.Default with fn = fn }
+        let color    color   (props: PlotProps) = { props with color   = color   }
+        let weight   weight  (props: PlotProps) = { props with weight  = weight  }
+        let opacity  opacity (props: PlotProps) = { props with opacity = opacity }
+        let style    style   (props: PlotProps) = { props with style   = style   }
+        let minDepth depth   (props: PlotProps) = { props with minSamplingDepth = depth }
+        let maxDepth depth   (props: PlotProps) = { props with maxSamplingDepth = depth }
+        [<ReactComponent>]
+        let render axis props =
+            match axis with
+            | XAxis -> Verbatim.OfX (props.fn, color = props.color, weight = props.weight, opacity = props.opacity, style = props.style,
+                                     minSamplingDepth = props.minSamplingDepth, maxSamplingDepth = props.maxSamplingDepth)
+            | YAxis -> Verbatim.OfY (props.fn, color = props.color, weight = props.weight, opacity = props.opacity, style = props.style,
+                                     minSamplingDepth = props.minSamplingDepth, maxSamplingDepth = props.maxSamplingDepth)
+
+        let renderInequality axis leq ueq lprop uprop =
+            match axis with
+            | XAxis -> Verbatim.Inequality (y = createObj [ leq.ToString () ==> lprop.fn; ueq.ToString () ==> uprop.fn ],
+                                            lowerColor = lprop.color, lowerWeight = lprop.weight,lowerOpacity = lprop.opacity,
+                                            upperColor = uprop.color, upperWeight = uprop.weight, upperOpacity = uprop.opacity)
+            | YAxis -> Verbatim.Inequality (x = createObj [ leq.ToString () ==> lprop.fn; ueq.ToString () ==> uprop.fn ],
+                                            lowerColor = lprop.color, lowerWeight = lprop.weight,lowerOpacity = lprop.opacity,
+                                            upperColor = uprop.color, upperWeight = uprop.weight, upperOpacity = uprop.opacity)

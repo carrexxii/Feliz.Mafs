@@ -15,6 +15,7 @@ let Router () =
             | [ "text" ]        -> Mafs.Examples.Text ()
             | [ "coordinates" ] -> Mafs.Examples.Coordinates ()
             | [ "camera" ]      -> Mafs.Examples.Camera ()
+            | [ "plots" ]       -> Mafs.Examples.Plots ()
             | _ -> Html.h1 "Not found"
         ]
     ]

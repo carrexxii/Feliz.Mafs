@@ -252,3 +252,80 @@ let Coordinates () =
                 }
             """
     ]
+
+[<ReactComponent>]
+let Plots () =
+    Html.div [
+        Heading "Plots"
+        Mafs MafsProps.Default [
+            Cartesian CartesianProps.Default
+            
+            Plot.create sin |> Plot.render XAxis
+            Plot.create <| fun x -> 2.0 / (1.0 + (exp -x)) - 1.0
+            |> Plot.color "magenta"
+            |> Plot.render YAxis
+        ]
+        CodeBlock
+            """ import { Mafs, Coordinates, Plot, Theme } from "mafs"
+
+                function FunctionsOfXAndY() {
+                    const sigmoid1 = (x: number) => 2 / (1 + Math.exp(-x)) - 1
+
+                    return (
+                        <Mafs>
+                            <Coordinates.Cartesian />
+                            <Plot.OfX y={Math.sin} color={Theme.blue} />
+                            <Plot.OfY x={sigmoid1} color={Theme.pink} />
+                        </Mafs>
+                    )
+                }
+            """
+        
+        MafsDefault [
+            Cartesian CartesianProps.Default
+
+            let point = useMovablePoint [| 0; 0 |]
+            Plot.renderInequality YAxis LTEQ GT
+                (Plot.create (fun y -> cos (y + point.y) - point.x))
+                (Plot.create (fun y -> sin (y - point.y) + point.x))
+
+            Plot.renderInequality XAxis LTEQ GT
+                (Plot.create (fun x -> cos (x + point.x) - point.y)
+                 |> Plot.color Theme.pink)
+                (Plot.create (fun x -> sin (x - point.x) + point.y)
+                 |> Plot.color Theme.pink)
+
+            point.element
+        ]
+        CodeBlock
+            """ import { Mafs, Coordinates, Plot, Theme, useMovablePoint } from "mafs"
+
+                function InequalitiesExample() {
+                    const a = useMovablePoint([0, -1])
+
+                    return (
+                        <Mafs>
+                            <Coordinates.Cartesian />
+
+                            <Plot.Inequality
+                                x={{
+                                    "<=": (y) => Math.cos(y + a.y) - a.x,
+                                    ">": (y) => Math.sin(y - a.y) + a.x,
+                                }}
+                                color={Theme.blue}
+                            />
+
+                            <Plot.Inequality
+                                y={{
+                                "<=": (x) => Math.cos(x + a.x) - a.y,
+                                ">": (x) => Math.sin(x - a.x) + a.y,
+                                }}
+                                color={Theme.pink}
+                            />
+
+                            {a.element}
+                        </Mafs>
+                    )
+                }
+            """
+    ]
