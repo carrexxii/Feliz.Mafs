@@ -29,12 +29,12 @@ module Plot =
               upper = LTEQ, (fun y -> 5) }
 
     let create fn = { Props.Default with fn = fn }
-    let color    color   props = { props with color    = color   }: Props
-    let weight   weight  props = { props with weight   = weight  }: Props
-    let opacity  opacity props = { props with opacity  = opacity }: Props
-    let style    style   props = { props with style    = style   }: Props
-    let minDepth depth   props = { props with minDepth = depth   }: Props
-    let maxDepth depth   props = { props with maxDepth = depth   }: Props
+    let color    color   props = { props with color    = color   }
+    let weight   weight  props = { props with weight   = weight  }
+    let opacity  opacity props = { props with opacity  = opacity }
+    let style    style   props = { props with style    = style   }
+    let minDepth depth   props = { props with minDepth = depth   }
+    let maxDepth depth   props = { props with maxDepth = depth   }
 
     [<ReactComponent>]
     let render axis props =
@@ -52,3 +52,30 @@ module Plot =
         | YAxis -> Verbatim.Plot.Inequality (x = createObj [ leq.ToString () ==> lprop.fn; ueq.ToString () ==> uprop.fn ],
                                              lowerColor = lprop.color, lowerWeight = lprop.weight,lowerOpacity = lprop.opacity,
                                              upperColor = uprop.color, upperWeight = uprop.weight, upperOpacity = uprop.opacity)
+
+    module VectorField =
+        type Props =
+            { fn         : Vec2 -> Vec2
+              opacity    : Vec2 -> float
+              step       : float
+              opacityStep: float
+              color      : Color }
+            static member Default =
+                { fn          = fun p -> p
+                  opacity     = fun p -> 1.0
+                  step        = 1.0
+                  opacityStep = 1.0
+                  color       = Theme.foreground }
+
+        let create fn = { Props.Default with fn = fn }
+        let opacity     opacity     props = { props with opacity     = opacity     }: Props
+        let step        step        props = { props with step        = step        }: Props
+        let opacityStep opacityStep props = { props with opacityStep = opacityStep }: Props
+        let color       color       props = { props with color       = color       }: Props
+
+        [<ReactComponent>]
+        let render props =
+            let xy p = props.fn (Vec2 p) |> _.array
+            let opacity p = props.opacity (Vec2 p)
+            Verbatim.Plot.VectorField (xy, xyOpacity = opacity, step = props.step,
+                                       opacityStep = props.opacityStep, color = props.color)

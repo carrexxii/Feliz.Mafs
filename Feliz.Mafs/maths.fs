@@ -1,6 +1,7 @@
 namespace Feliz.Mafs
 
 open Fable.Core
+open Feliz
 
 [<AutoOpen>]
 module Maths =

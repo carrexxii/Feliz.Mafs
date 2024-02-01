@@ -201,8 +201,8 @@ module Verbatim =
 
         [<ReactComponent(import="Plot.VectorField", from="mafs")>]
         static member VectorField (xy          : float array -> float array,
-                                   ?xyOpacity  : float array -> float,
                                    ?step       : float,
+                                   ?xyOpacity  : float array -> float,
                                    ?opacityStep: float,
                                    ?color      : Color) = React.imported ()
 
