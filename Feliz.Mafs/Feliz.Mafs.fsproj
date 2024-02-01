@@ -2,11 +2,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <Description>Fable/Feliz bindings for the Javascript/React library Mafs (https://mafs.dev/)</Description>
+    <PackageTags>fsharp;fable;feliz;react</PackageTags>
+    <Authors>carrexxii</Authors>
+    <Version>0.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="maths.fs" />
     <Compile Include="common.fs" />
     <Compile Include="verbatim.fs" />
+    <Compile Include="maths.fs" />
     <Compile Include="mafs.fs" />
     <Compile Include="coordinates.fs" />
     <Compile Include="geometry.fs" />

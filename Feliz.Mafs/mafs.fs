@@ -15,7 +15,7 @@ module Mafs =
           viewBox: ViewBox
           preserveAspectRatio: U2<bool, Contain>
           ssr    : bool
-          onClick: Vec2 -> MouseEvent -> unit }
+          onClick: float array -> MouseEvent -> unit }
         static member Default =
             { width   = !^Auto
               height  = 500

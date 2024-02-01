@@ -6,6 +6,15 @@ open Feliz
 
 [<AutoOpen>]
 module Common =
+    type Matrix = float array
+    type IMatrixBuilder =
+        { mult     : Matrix        -> Matrix
+          translate: float * float -> Matrix
+          rotate   : float         -> Matrix
+          scale    : float * float -> Matrix
+          shear    : float * float -> Matrix
+          get      : unit          -> Matrix }
+
     type Color = string
 
     type ITheme =
@@ -23,11 +32,6 @@ module Common =
 
     [<StringEnum>] type Auto    = Auto
     [<StringEnum>] type Contain = Contain
-
-    [<StringEnum>]
-    type Constrain =
-        | Horizontal
-        | Vertical
 
     type SVGProps = obj
 
@@ -49,8 +53,8 @@ module Common =
 
     type MovablePoint =
         { element : ReactElement
-          point   : Vec2
-          setPoint: Vec2 -> unit
+          point   : float array
+          setPoint: float array -> unit
           x       : float
           y       : float }
 
@@ -80,8 +84,8 @@ module Common =
               labels = fun x -> $"{x}" }
 
     type ViewBox =
-        { x      : Vec2
-          y      : Vec2
+        { x      : float array
+          y      : float array
           padding: float }
         static member Default =
             { x       = [| -3; 3 |]

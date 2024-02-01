@@ -123,7 +123,7 @@ module Pages =
                 """
 
             SubHeading "Making things interactive"
-            let phase = constrainedPoint [| 0.0; 0.0 |] !^Horizontal
+            let phase = movablePoint (vec 0 0) Theme.foreground None
             Mafs { MafsProps.Default with
                     viewBox = { ViewBox.Default with
                                   x = [| -10; 10 |]
@@ -299,7 +299,7 @@ module Pages =
             Mafs MafsProps.Default [
                 Cartesian CartesianProps.Default
 
-                let point = movablePoint [| 0; 0 |]
+                let point = movablePoint (vec 0 0) Theme.foreground None
                 Plot.renderInequality YAxis LTEQ GT
                     (Plot.create (fun y -> cos (y + point.y) - point.x))
                     (Plot.create (fun y -> sin (y - point.y) + point.x))

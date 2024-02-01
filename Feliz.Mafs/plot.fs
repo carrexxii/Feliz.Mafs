@@ -5,21 +5,21 @@ open Feliz
 
 module Plot =
     type Props =
-        { fn              : float -> float
-          color           : Color
-          opacity         : float
-          weight          : float
-          style           : LineStyle
-          minSamplingDepth: float
-          maxSamplingDepth: float }
+        { fn      : float -> float
+          color   : Color
+          opacity : float
+          weight  : float
+          style   : LineStyle
+          minDepth: float
+          maxDepth: float }
         static member Default =
-            { fn               = fun x -> x
-              color            = "blue"
-              opacity          = 1.0
-              weight           = 2.0
-              style            = Solid
-              minSamplingDepth = 8
-              maxSamplingDepth = 15 }
+            { fn       = fun x -> x
+              color    = Theme.foreground
+              opacity  = 1.0
+              weight   = 2.0
+              style    = Solid
+              minDepth = 8
+              maxDepth = 15 }
 
     type InequalityPair =
         { lower: Inequality * (float -> float)
@@ -29,20 +29,20 @@ module Plot =
               upper = LTEQ, (fun y -> 5) }
 
     let create fn = { Props.Default with fn = fn }
-    let color    color   props = { props with color   = color   }: Props
-    let weight   weight  props = { props with weight  = weight  }: Props
-    let opacity  opacity props = { props with opacity = opacity }: Props
-    let style    style   props = { props with style   = style   }: Props
-    let minDepth depth   props = { props with minSamplingDepth = depth }: Props
-    let maxDepth depth   props = { props with maxSamplingDepth = depth }: Props
+    let color    color   props = { props with color    = color   }: Props
+    let weight   weight  props = { props with weight   = weight  }: Props
+    let opacity  opacity props = { props with opacity  = opacity }: Props
+    let style    style   props = { props with style    = style   }: Props
+    let minDepth depth   props = { props with minDepth = depth   }: Props
+    let maxDepth depth   props = { props with maxDepth = depth   }: Props
 
     [<ReactComponent>]
     let render axis props =
         match axis with
         | XAxis -> Verbatim.Plot.OfX (props.fn, color = props.color, weight = props.weight, opacity = props.opacity, style = props.style,
-                                      minSamplingDepth = props.minSamplingDepth, maxSamplingDepth = props.maxSamplingDepth)
+                                      minSamplingDepth = props.minDepth, maxSamplingDepth = props.maxDepth)
         | YAxis -> Verbatim.Plot.OfY (props.fn, color = props.color, weight = props.weight, opacity = props.opacity, style = props.style,
-                                      minSamplingDepth = props.minSamplingDepth, maxSamplingDepth = props.maxSamplingDepth)
+                                      minSamplingDepth = props.minDepth, maxSamplingDepth = props.maxDepth)
 
     let renderInequality axis leq ueq lprop uprop =
         match axis with

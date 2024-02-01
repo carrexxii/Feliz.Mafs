@@ -14,7 +14,7 @@ type Verbatim =
                         ?viewBox: ViewBox,
                         ?preserveAspectRatio: U2<bool, Contain>,
                         ?ssr    : bool,
-                        ?onClick: Vec2 -> MouseEvent -> unit) = React.imported ()
+                        ?onClick: float array -> MouseEvent -> unit) = React.imported ()
 
     [<ReactComponent(import="Point", from="mafs")>]
     static member Point (x              : float,
@@ -24,8 +24,8 @@ type Verbatim =
                          ?svgCircleProps: SVGProps) = React.imported ()
 
     [<ReactComponent(import="Vector", from="mafs")>]
-    static member Vector (tip          : Vec2,
-                          ?tail        : Vec2,
+    static member Vector (tip          : float array,
+                          ?tail        : float array,
                           ?color       : Color,
                           ?opacity     : float,
                           ?weight      : float,
@@ -33,7 +33,7 @@ type Verbatim =
                           ?svgLineProps: SVGProps) = React.imported ()
 
     [<ReactComponent(import="Circle", from="mafs")>]
-    static member Circle (center          : Vec2,
+    static member Circle (center          : float array,
                           radius          : float,
                           ?angle          : float,
                           ?color          : Color,
@@ -44,8 +44,8 @@ type Verbatim =
                           ?svgEllipseProps: SVGProps) = React.imported ()
 
     [<ReactComponent(import="Ellipse", from="mafs")>]
-    static member Ellipse (center          : Vec2,
-                           radius          : Vec2,
+    static member Ellipse (center          : float array,
+                           radius          : float array,
                            ?color          : Color,
                            ?weight         : float,
                            ?fillOpacity    : float,
@@ -54,7 +54,7 @@ type Verbatim =
                            ?svgEllipseProps: SVGProps) = React.imported ()
 
     [<ReactComponent(import="Polygon", from="mafs")>]
-    static member Polygon (points          : Vec2 array,
+    static member Polygon (points          : float array array,
                            ?color          : Color,
                            ?weight         : float,
                            ?fillOpacity    : float,
@@ -63,7 +63,7 @@ type Verbatim =
                            ?svgPolygonProps: SVGProps) = React.imported ()
 
     [<ReactComponent(import="Polyline", from="mafs")>]
-    static member Polyline (points          : Vec2 array,
+    static member Polyline (points          : float array array,
                             ?color          : Color,
                             ?weight         : float,
                             ?fillOpacity    : float,
@@ -83,22 +83,22 @@ type Verbatim =
 
     [<ReactComponent(import="LaTeX", from="mafs")>]
     static member LaTeX (tex         : string,
-                         at          : Vec2,
-                         color       : Color,
-                         katexOptions: KatexOptions) = React.imported ()
+                         ?at          : float array,
+                         ?color       : Color,
+                         ?katexOptions: KatexOptions) = React.imported ()
 
     [<ReactComponent(import="Transform", from="mafs")>]
     static member Transform (children  : ReactElement list,
                              ?matrix   : Matrix,
-                             ?translate: Vec2,
-                             ?scale    : U2<float, Vec2>,
+                             ?translate: float array,
+                             ?scale    : U2<float, float array>,
                              ?rotate   : float,
-                             ?shear    : Vec2) = React.imported ()
+                             ?shear    : float array) = React.imported ()
 
     [<Import("useMovablePoint", "mafs")>]
     [<Emit("useMovablePoint($1, {constrain: $2, color: $3})")>]
-    static member useMovablePoint (initialPoint: Vec2,
-                                   ?constrain  : U2<Constrain, Vec2 -> Vec2>,
+    static member useMovablePoint (initialPoint: float array,
+                                   ?constrain  : U2<string, float array -> float array>,
                                    ?color      : Color) = jsNative<MovablePoint>
 
 module Verbatim =
@@ -116,23 +116,23 @@ module Verbatim =
 
     type Line =
         [<ReactComponent(import="Line.ThroughPoints", from="mafs")>]
-        static member ThroughPoints (point1  : Vec2,
-                                     point2  : Vec2,
+        static member ThroughPoints (point1  : float array,
+                                     point2  : float array,
                                      ?color  : Color,
                                      ?opacity: float,
                                      ?weight : float,
                                      ?style  : LineStyle) = React.imported ()
 
         [<ReactComponent(import="Line.Segment", from="mafs")>]
-        static member LineSegment (point1  : Vec2,
-                                   point2  : Vec2,
+        static member LineSegment (point1  : float array,
+                                   point2  : float array,
                                    ?color  : Color,
                                    ?opacity: float,
                                    ?weight : float,
                                    ?style  : LineStyle) = React.imported ()
 
         [<ReactComponent(import="Line.PointSlope", from="mafs")>]
-        static member PointSlope (point   : Vec2,
+        static member PointSlope (point   : float array,
                                   slope   : float,
                                   ?color  : Color,
                                   ?opacity: float,
@@ -140,7 +140,7 @@ module Verbatim =
                                   ?style  : LineStyle) = React.imported ()
 
         [<ReactComponent(import="Line.PointAngle", from="mafs")>]
-        static member PointAngle (point   : Vec2,
+        static member PointAngle (point   : float array,
                                   angle   : float,
                                   ?color  : Color,
                                   ?opacity: float,
@@ -189,8 +189,8 @@ module Verbatim =
                                   ?svgFillPathProps : SVGProps) = React.imported ()
 
         [<ReactComponent(import="Plot.Parametric", from="mafs")>]
-        static member Parametric (xy               : float -> Vec2,
-                                  t                : Vec2,
+        static member Parametric (xy               : float -> float array,
+                                  t                : float array,
                                   ?color           : Color,
                                   ?opacity         : float,
                                   ?weight          : float,
@@ -200,11 +200,34 @@ module Verbatim =
                                   ?svgPathProps    : SVGProps) = React.imported ()
 
         [<ReactComponent(import="Plot.VectorField", from="mafs")>]
-        static member VectorField (xy          : Vec2 -> Vec2,
-                                   ?xyOpacity  : Vec2 -> float,
+        static member VectorField (xy          : float array -> float array,
+                                   ?xyOpacity  : float array -> float,
                                    ?step       : float,
                                    ?opacityStep: float,
                                    ?color      : Color) = React.imported ()
+
+    type vec =
+        [<Import("vec.add"        , "mafs")>] static member add         (v: float array, v2: float array)           = jsNative<float array>
+        [<Import("vec.sub"        , "mafs")>] static member sub         (v: float array, v2: float array)           = jsNative<float array>
+        [<Import("vec.scale"      , "mafs")>] static member scale       (v: float array, sc: float)                 = jsNative<float array>
+        [<Import("vec.dist"       , "mafs")>] static member dist        (v: float array, v2: float array)           = jsNative<float>
+        [<Import("vec.mag"        , "mafs")>] static member mag         (v: float array)                            = jsNative<float>
+        [<Import("vec.dot"        , "mafs")>] static member dot         (v: float array, v2: float array)           = jsNative<float>
+        [<Import("vec.lerp"       , "mafs")>] static member lerp        (v: float array, v2: float array, t: float) = jsNative<float array>
+        [<Import("vec.midpoint"   , "mafs")>] static member midpoint    (v: float array, v2: float array)           = jsNative<float array>
+        [<Import("vec.normal"     , "mafs")>] static member normal      (v: float array)                            = jsNative<float array>
+        [<Import("vec.normalize"  , "mafs")>] static member normalize   (v: float array)                            = jsNative<float array>
+        [<Import("vec.rotate"     , "mafs")>] static member rotate      (v: float array, a: float)                  = jsNative<float array>
+        [<Import("vec.rotateAbout", "mafs")>] static member rotateAbout (v: float array, cp: float array, a: float) = jsNative<float array>
+        [<Import("vec.squareDist" , "mafs")>] static member squareDist  (v: float array, v2: float array)           = jsNative<float array>
+        [<Import("vec.withMag"    , "mafs")>] static member withMag     (v: float array, m: float)                  = jsNative<float array>
+
+        [<Import("vec.matrixBuilder", "mafs")>] static member matrixBuilder (?m: Matrix)                = jsNative<IMatrixBuilder>
+        [<Import("vec.det"          , "mafs")>] static member det           (m: Matrix)                 = jsNative<float>
+        [<Import("vec.matrixInvert" , "mafs")>] static member matrixInvert  (a: Matrix)                 = jsNative<Matrix option>
+        [<Import("vec.matrixMult"   , "mafs")>] static member matrixMult    (m: Matrix, m2: Matrix)     = jsNative<Matrix>
+        [<Import("vec.toCSS"        , "mafs")>] static member toCSS         (matrix: Matrix)            = jsNative<string>
+        [<Import("vec.transform"    , "mafs")>] static member transform     (v: float array, m: Matrix) = jsNative<float array>
 
     type Debug =
         [<ReactComponent(import="Debug.TransformWidget", from="mafs")>]
@@ -212,3 +235,13 @@ module Verbatim =
 
         [<ReactComponent(import="Debug.ViewportInfo", from="mafs")>]
         static member DebugViewPortInfo (precision: int) = React.imported ()
+
+    type Katex =
+        [<Import("default.render", "katex")>]
+        static member render (text    : string,
+                              element : HTMLElement,
+                              ?options: KatexOptions) = jsNative<unit>
+
+        [<Import("default.renderToString", "katex")>]
+        static member renderToString (text    : string,
+                                      ?options: KatexOptions) = jsNative<string>
