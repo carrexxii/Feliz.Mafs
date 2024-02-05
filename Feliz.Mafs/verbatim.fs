@@ -59,7 +59,7 @@ type Verbatim =
                            ?weight         : float,
                            ?fillOpacity    : float,
                            ?strokeOpacity  : float,
-                           ?strokeStyle    : StrokeStyle,
+                           ?strokeStyle    : LineStyle,
                            ?svgPolygonProps: SVGProps) = React.imported ()
 
     [<ReactComponent(import="Polyline", from="mafs")>]
@@ -68,7 +68,7 @@ type Verbatim =
                             ?weight         : float,
                             ?fillOpacity    : float,
                             ?strokeOpacity  : float,
-                            ?strokeStyle    : StrokeStyle,
+                            ?strokeStyle    : LineStyle,
                             ?svgPolygonProps: SVGProps) = React.imported ()
 
     [<ReactComponent(import="Text", from="mafs")>]
@@ -82,7 +82,7 @@ type Verbatim =
                         ?svgTextProps  : SVGProps) = React.imported ()
 
     [<ReactComponent(import="LaTeX", from="mafs")>]
-    static member LaTeX (tex         : string,
+    static member LaTeX (tex          : string,
                          ?at          : float array,
                          ?color       : Color,
                          ?katexOptions: KatexOptions) = React.imported ()

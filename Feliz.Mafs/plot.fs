@@ -75,7 +75,7 @@ module Plot =
 
         [<ReactComponent>]
         let render props =
-            let xy p = props.fn (Vec2 p) |> _.array
-            let opacity p = props.opacity (Vec2 p)
+            let xy (p: float array) = props.fn (Vec2 p) |> _.array
+            let opacity (p: float array) = props.opacity (Vec2 p)
             Verbatim.Plot.VectorField (xy, xyOpacity = opacity, step = props.step,
                                        opacityStep = props.opacityStep, color = props.color)

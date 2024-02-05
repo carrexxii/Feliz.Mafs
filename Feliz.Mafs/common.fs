@@ -35,11 +35,6 @@ module Common =
 
     type SVGProps = obj
 
-    [<StringEnum>]
-    type StrokeStyle =
-        | Solid
-        | Dashed
-
     module Labels =
         [<Import("labelPi", "mafs")>]
         let Pi = jsNative<int -> string>

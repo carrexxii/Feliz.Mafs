@@ -1,22 +1,24 @@
 namespace Feliz.Mafs
 
-open Fable.Core
-open Feliz
+open System
 
 [<AutoOpen>]
 module Maths =
     type Angle =
         | Degrees of float
         | Radians of float
+        static member toRad = function
+            | Degrees deg -> deg / (2.0*Math.PI)
+            | Radians rad -> rad
         static member ( * ) (a: Angle, s: float) =
             match a with
             | Degrees a -> Degrees (a * s)
             | Radians a -> Radians (a * s)
         static member ( * ) (s: float, a: Angle) = a * s
 
-
     type Vec2 (x, y) =
-        new (arr: float array) = Vec2 (arr[0], arr[1])
+        new (arr: float array)  = Vec2 (arr[0], arr[1])
+        new (pt : MovablePoint) = Vec2 (pt.x, pt.y)
         member this.x: float = x
         member this.y: float = y
 
