@@ -3,55 +3,91 @@ namespace Feliz.Mafs
 open Fable.Core.JsInterop
 open Feliz
 
+[<AutoOpen>]
 module Plot =
-    type Props =
-        { fn      : float -> float
-          color   : Color
-          opacity : float
-          weight  : float
-          style   : LineStyle
-          minDepth: float
-          maxDepth: float }
-        static member Default =
-            { fn       = fun x -> x
-              color    = Theme.foreground
-              opacity  = 1.0
-              weight   = 2.0
-              style    = Solid
-              minDepth = 8
-              maxDepth = 15 }
+    module Plot =
+        type Props =
+            { fn      : float -> float
+              color   : Color
+              opacity : float
+              weight  : float
+              style   : LineStyle
+              minDepth: float
+              maxDepth: float }
+            static member Default =
+                { fn       = fun x -> x
+                  color    = Theme.foreground
+                  opacity  = 1.0
+                  weight   = 2.0
+                  style    = Solid
+                  minDepth = 8
+                  maxDepth = 15 }
 
-    type InequalityPair =
-        { lower: Inequality * (float -> float)
-          upper: Inequality * (float -> float) }
-        static member Default =
-            { lower = GT, (fun x -> x)
-              upper = LTEQ, (fun y -> 5) }
+        type InequalityPair =
+            { lower: Inequality * (float -> float)
+              upper: Inequality * (float -> float) }
+            static member Default =
+                { lower = GT, (fun x -> x)
+                  upper = LTEQ, (fun y -> 5) }
 
-    let create fn = { Props.Default with fn = fn }
-    let color    color   props = { props with color    = color   }
-    let weight   weight  props = { props with weight   = weight  }
-    let opacity  opacity props = { props with opacity  = opacity }
-    let style    style   props = { props with style    = style   }
-    let minDepth depth   props = { props with minDepth = depth   }
-    let maxDepth depth   props = { props with maxDepth = depth   }
+        let create fn = { Props.Default with fn = fn }
+        let color    color   props = { props with color    = color   }
+        let weight   weight  props = { props with weight   = weight  }
+        let opacity  opacity props = { props with opacity  = opacity }
+        let style    style   props = { props with style    = style   }
+        let minDepth depth   props = { props with minDepth = depth   }
+        let maxDepth depth   props = { props with maxDepth = depth   }
 
-    [<ReactComponent>]
-    let render axis props =
-        match axis with
-        | XAxis -> Verbatim.Plot.OfX (props.fn, color = props.color, weight = props.weight, opacity = props.opacity, style = props.style,
+        [<ReactComponent>]
+        let render axis props =
+            match axis with
+            | XAxis -> Verbatim.Plot.OfX (props.fn, color = props.color, weight = props.weight, opacity = props.opacity, style = props.style,
+                                          minSamplingDepth = props.minDepth, maxSamplingDepth = props.maxDepth)
+            | YAxis -> Verbatim.Plot.OfY (props.fn, color = props.color, weight = props.weight, opacity = props.opacity, style = props.style,
+                                          minSamplingDepth = props.minDepth, maxSamplingDepth = props.maxDepth)
+
+        let renderInequality axis leq ueq lprop uprop =
+            match axis with
+            | XAxis -> Verbatim.Plot.Inequality (y = createObj [ leq.ToString () ==> lprop.fn; ueq.ToString () ==> uprop.fn ],
+                                                 lowerColor = lprop.color, lowerWeight = lprop.weight,lowerOpacity = lprop.opacity,
+                                                 upperColor = uprop.color, upperWeight = uprop.weight, upperOpacity = uprop.opacity)
+            | YAxis -> Verbatim.Plot.Inequality (x = createObj [ leq.ToString () ==> lprop.fn; ueq.ToString () ==> uprop.fn ],
+                                                 lowerColor = lprop.color, lowerWeight = lprop.weight,lowerOpacity = lprop.opacity,
+                                                 upperColor = uprop.color, upperWeight = uprop.weight, upperOpacity = uprop.opacity)
+
+    module Parametric =
+        type Props =
+            { fn      : float -> Vec2
+              t       : Vec2
+              color   : Color
+              opacity : float
+              weight  : float
+              style   : LineStyle
+              minDepth: float
+              maxDepth: float }
+            static member Default =
+                { fn       = fun t -> vec (1.0 - t) (t - 1.0)
+                  t        = vec 0 1
+                  color    = Theme.foreground
+                  opacity  = 1.0
+                  weight   = 2.0
+                  style    = Solid
+                  minDepth = 8
+                  maxDepth = 15 }
+
+        let create fn = { Props.Default with fn = fn }
+        let color    color   props = { props with color    = color   }
+        let weight   weight  props = { props with weight   = weight  }
+        let opacity  opacity props = { props with opacity  = opacity }
+        let style    style   props = { props with style    = style   }
+        let minDepth depth   props = { props with minDepth = depth   }
+        let maxDepth depth   props = { props with maxDepth = depth   }
+
+        [<ReactComponent>]
+        let render (t: Vec2) props =
+            let xy (t: float) = props.fn t |> _.array
+            Verbatim.Plot.Parametric (xy, t.array, color = props.color, opacity = props.opacity, style = props.style,
                                       minSamplingDepth = props.minDepth, maxSamplingDepth = props.maxDepth)
-        | YAxis -> Verbatim.Plot.OfY (props.fn, color = props.color, weight = props.weight, opacity = props.opacity, style = props.style,
-                                      minSamplingDepth = props.minDepth, maxSamplingDepth = props.maxDepth)
-
-    let renderInequality axis leq ueq lprop uprop =
-        match axis with
-        | XAxis -> Verbatim.Plot.Inequality (y = createObj [ leq.ToString () ==> lprop.fn; ueq.ToString () ==> uprop.fn ],
-                                             lowerColor = lprop.color, lowerWeight = lprop.weight,lowerOpacity = lprop.opacity,
-                                             upperColor = uprop.color, upperWeight = uprop.weight, upperOpacity = uprop.opacity)
-        | YAxis -> Verbatim.Plot.Inequality (x = createObj [ leq.ToString () ==> lprop.fn; ueq.ToString () ==> uprop.fn ],
-                                             lowerColor = lprop.color, lowerWeight = lprop.weight,lowerOpacity = lprop.opacity,
-                                             upperColor = uprop.color, upperWeight = uprop.weight, upperOpacity = uprop.opacity)
 
     module VectorField =
         type Props =

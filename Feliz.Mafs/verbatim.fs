@@ -4,6 +4,13 @@ open Fable.Core
 open Feliz
 open Browser.Types
 
+type VerbatimMovablePoint =
+    { element : ReactElement
+      point   : float array
+      setPoint: float array -> unit
+      x       : float
+      y       : float }
+
 type Verbatim =
     [<ReactComponent(import="Mafs", from="mafs")>]
     static member Mafs (children: IReactProperty list,
@@ -11,7 +18,7 @@ type Verbatim =
                         ?height : float,
                         ?pan    : bool,
                         ?zoom   : U2<bool, {| min: float; max: float |}>,
-                        ?viewBox: ViewBox,
+                        ?viewBox: {| x: float array; y: float array; padding: float |},
                         ?preserveAspectRatio: U2<bool, Contain>,
                         ?ssr    : bool,
                         ?onClick: float array -> MouseEvent -> unit) = React.imported ()
@@ -99,7 +106,7 @@ type Verbatim =
     [<Emit("useMovablePoint($1, {constrain: $2, color: $3})")>]
     static member useMovablePoint (initialPoint: float array,
                                    ?constrain  : U2<string, float array -> float array>,
-                                   ?color      : Color) = jsNative<MovablePoint>
+                                   ?color      : Color) = jsNative<VerbatimMovablePoint>
 
 module Verbatim =
     type Coordinates =

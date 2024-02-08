@@ -46,13 +46,6 @@ module Common =
         | [<CompiledName("s")>] South | [<CompiledName("sw")>] SouthWest
         | [<CompiledName("w")>] West  | [<CompiledName("nw")>] NorthWest
 
-    type MovablePoint =
-        { element : ReactElement
-          point   : float array
-          setPoint: float array -> unit
-          x       : float
-          y       : float }
-
     [<StringEnum>]
     type LineStyle =
         | Solid
@@ -77,12 +70,3 @@ module Common =
         static member Default =
             { lines  = 1.0
               labels = fun x -> $"{x}" }
-
-    type ViewBox =
-        { x      : float array
-          y      : float array
-          padding: float }
-        static member Default =
-            { x       = [| -3; 3 |]
-              y       = [| -3; 3 |]
-              padding = 0.5 }

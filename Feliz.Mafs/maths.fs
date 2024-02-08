@@ -10,15 +10,17 @@ module Maths =
         static member toRad = function
             | Degrees deg -> deg / (2.0*Math.PI)
             | Radians rad -> rad
+        static member toDeg = function
+            | Degrees deg -> deg
+            | Radians rad -> rad * 360.0 / (2.0 * Math.PI)
         static member ( * ) (a: Angle, s: float) =
             match a with
             | Degrees a -> Degrees (a * s)
             | Radians a -> Radians (a * s)
         static member ( * ) (s: float, a: Angle) = a * s
 
-    type Vec2 (x, y) =
-        new (arr: float array)  = Vec2 (arr[0], arr[1])
-        new (pt : MovablePoint) = Vec2 (pt.x, pt.y)
+    and Vec2 (x, y) =
+        new (arr: float array) = Vec2 (arr[0], arr[1])
         member this.x: float = x
         member this.y: float = y
 
@@ -28,7 +30,7 @@ module Maths =
         member this.mag                       = Verbatim.vec.mag        this.array
         member this.lerp (v: Vec2) (t: float) = Verbatim.vec.lerp       (this.array, v.array, t) |> Vec2
         member this.midpoint (v: Vec2)        = Verbatim.vec.midpoint   (this.array, v.array)    |> Vec2
-        member this.normal                    = Verbatim.vec.normal     this.array               |> Vec2
+        // member this.normal                    = Verbatim.vec.normal     this.array               |> Vec2
         member this.squareDist (v: Vec2)      = Verbatim.vec.squareDist (this.array, v.array)    |> Vec2
         member this.withMag (s: float)        = Verbatim.vec.withMag    (this.array, s)          |> Vec2
         member this.rotate angle =
@@ -46,7 +48,11 @@ module Maths =
         static member ( - ) (v: Vec2 , w: Vec2)  = Verbatim.vec.sub   (v.array, w.array) |> Vec2
         static member ( * ) (v: Vec2 , s: float) = Verbatim.vec.scale (v.array, s)       |> Vec2
         static member ( * ) (s: float, v: Vec2)  = Verbatim.vec.scale (v.array, s)       |> Vec2
+        static member ( / ) (v: Vec2 , s: float) = Verbatim.vec.scale (v.array, 1.0/s)   |> Vec2
+        static member ( / ) (s: float, v: Vec2)  = Verbatim.vec.scale (v.array, 1.0/s)   |> Vec2
         static member ( * ) (v: Vec2 , w: Vec2)  = Verbatim.vec.dot   (v.array, w.array)
+
+        member this.normal = this / (this.x**2.0 + this.y**2.0)**0.5
 
     [<AutoOpen>]
     type Transform =
@@ -59,4 +65,3 @@ module Maths =
         | Constrain of (Vec2 -> Vec2)
         | Horizontal
         | Vertical
-        | None

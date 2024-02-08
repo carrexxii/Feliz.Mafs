@@ -13,8 +13,8 @@
     <Compile Include="maths.fs" />
     <Compile Include="mafs.fs" />
     <Compile Include="coordinates.fs" />
-    <Compile Include="geometry.fs" />
     <Compile Include="plot.fs" />
+    <Compile Include="geometry.fs" />
     <Compile Include="text.fs" />
   </ItemGroup>
   <ItemGroup>
