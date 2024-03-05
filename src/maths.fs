@@ -8,11 +8,11 @@ module Maths =
         | Degrees of float
         | Radians of float
         static member toRad = function
-            | Degrees deg -> deg / (2.0*Math.PI)
+            | Degrees deg -> deg / 360.0 * 2.0*Math.PI
             | Radians rad -> rad
         static member toDeg = function
             | Degrees deg -> deg
-            | Radians rad -> rad * 360.0 / (2.0 * Math.PI)
+            | Radians rad -> rad * 360.0 / 2.0*Math.PI
         static member ( * ) (a: Angle, s: float) =
             match a with
             | Degrees a -> Degrees (a * s)
@@ -34,15 +34,9 @@ module Maths =
         member this.squareDist (v: Vec2)      = Verbatim.vec.squareDist (this.array, v.array)    |> Vec2
         member this.withMag (s: float)        = Verbatim.vec.withMag    (this.array, s)          |> Vec2
         member this.rotate angle =
-            match angle with
-            | Degrees deg -> (this.array, deg / (2.0 * System.Math.PI))
-            | Radians rad -> (this.array, rad)
-            |> Verbatim.vec.rotate |> Vec2
+            Verbatim.vec.rotate (this.array, Angle.toRad angle) |> Vec2
         member this.rotateAbout (v: Vec2) angle =
-            match angle with
-            | Degrees deg -> (this.array, v.array, deg / (2.0 * System.Math.PI))
-            | Radians rad -> (this.array, v.array, rad)
-            |> Verbatim.vec.rotateAbout |> Vec2
+            Verbatim.vec.rotateAbout (this.array, v.array, Angle.toRad angle) |> Vec2
 
         static member ( + ) (v: Vec2 , w: Vec2)  = Verbatim.vec.add   (v.array, w.array) |> Vec2
         static member ( - ) (v: Vec2 , w: Vec2)  = Verbatim.vec.sub   (v.array, w.array) |> Vec2

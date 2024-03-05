@@ -28,14 +28,17 @@ module Mafs =
             { Props.Default with width = !^500.0 }
 
     let create () = Props.Default
-    let width      (width: float)     props = { props with width      = !^width             }
-    let height     height             props = { props with height     = height              }
-    let pan        pan                props = { props with pan        = pan                 }
-    let zoom       zoomX zoomY        props = { props with zoom       = !^{| min = zoomX
-                                                                             max = zoomY |} }
-    let viewBox    viewBox            props = { props with viewBox    = viewBox             }
-    let preserveAR (preserveAR: bool) props = { props with preserveAR = !^preserveAR        }
-    let onClick    onClick            props = { props with onClick    = onClick             }
+    let width      (width: float) props = { props with width      = !^width             }
+    let height     height         props = { props with height     = height              }
+    let pan        pan            props = { props with pan        = pan                 }
+    let zoom       zoomX zoomY    props = { props with zoom       = !^{| min = zoomX
+                                                                         max = zoomY |} }
+    let viewBox    viewBox        props = { props with viewBox    = viewBox             }
+    let onClick    onClick        props = { props with onClick    = onClick             }
+    let preserveAR (preserve: bool) props =
+        if preserve
+        then { props with preserveAR = !^Contain }
+        else { props with preserveAR = !^false   }
 
     let Mafs (props: Props) (children: ReactElement list) =
         let viewBox = {| x = props.viewBox.x.array; y = props.viewBox.y.array; padding = props.viewBox.padding |}

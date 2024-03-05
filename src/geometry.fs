@@ -71,7 +71,7 @@ module Geometry =
               constrain: Vec2 -> Vec2
               svgProps : SVGProps }
             static member Default =
-                { pos       = Vec2 (0, 0)
+                { pos       = vec 0 0
                   color     = Theme.foreground
                   opacity   = 1.0
                   constrain = fun p -> p

@@ -8,18 +8,18 @@
     <Version>0.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="common.fs" />
-    <Compile Include="verbatim.fs" />
-    <Compile Include="maths.fs" />
-    <Compile Include="mafs.fs" />
-    <Compile Include="coordinates.fs" />
-    <Compile Include="plot.fs" />
-    <Compile Include="geometry.fs" />
-    <Compile Include="text.fs" />
+    <Compile Include="src/common.fs" />
+    <Compile Include="src/verbatim.fs" />
+    <Compile Include="src/maths.fs" />
+    <Compile Include="src/mafs.fs" />
+    <Compile Include="src/coordinates.fs" />
+    <Compile Include="src/plot.fs" />
+    <Compile Include="src/geometry.fs" />
+    <Compile Include="src/text.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fable.Core" Version="4.2.*" />
-    <PackageReference Include="Feliz" Version="2.8.0-beta.0" />
+    <PackageReference Include="Feliz" Version="2.7.0" />
   </ItemGroup>
   <PropertyGroup>
     <NpmDependencies>
